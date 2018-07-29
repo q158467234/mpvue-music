@@ -122,7 +122,7 @@ export default {
     this._getSongList(options.id)
     setTimeout(() => {
       wx.hideLoading()
-    },2500)
+    },500)
     // if (this.data.playCount != 'undefined') {
     //       for (var i = 0; i < this.discList.length; i++) {
     //         if (this.data.id == this.discList[i].id) {

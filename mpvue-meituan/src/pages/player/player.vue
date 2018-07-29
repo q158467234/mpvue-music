@@ -58,6 +58,7 @@ import Lyric from 'lyric-parser'
 import {mapGetters, mapMutations, mapActions} from 'vuex'
 import { getMusic } from '@/api/recommend';
 import { initSong } from '@/api/song';
+var timeSet;
 export default {
   data() {
     return {
@@ -142,6 +143,7 @@ export default {
       saveSong: 'SAVE_SONG',
     }),
     prev() {
+      clearInterval(timeSet)
       let list = this.data.songList
       let id = this.song.id
       wx.showLoading({
@@ -165,27 +167,48 @@ export default {
           // 设置当前标题
           title: decodeURIComponent(this.song.name)
         });
-        this.audioCtx.src = this.song.url
-        this.audioCtx.singer = this.song.singer
-        this.audioCtx.title = this.song.name
+        setTimeout(() => {
+          this.audioCtx.singer = this.song.singer
+          this.audioCtx.title = this.song.name
+          this.audioCtx.src = this.song.url
+        }, 500)
+        // this.audioCtx.src = this.song.url
+        // this.audioCtx.singer = this.song.singer
+        // this.audioCtx.title = this.song.name
         this.audioCtx.onCanplay(() => {
           console.log('ok了')
           this.setPlayingState(true)
           this.audioCtx.play()
           wx.hideLoading()
         })
+        this.audioCtx.onWaiting(() => {
+          console.log('需要等待')
+        })
         const a = setInterval(() => {
+          console.log('是否在执行'+this.audioCtx.duration)
           this.allmiao = this.audioCtx.duration
         }, 50)
         if (this.allmiao) {
-          clearInterval('a')
-          setTimeout(() => {
-            wx.hideLoading()
-          }, 2500)
+          console.log('清除')
+          console.log(this.allmiao)
+          clearInterval(a)
         }
-
+        this.nowmiao = this.audioCtx.currentTime;
+        if (typeof (this.audioCtx.currentTime) === "undefined")
+        {
+          this.nowmiao = 0;
+        }
+        timeSet = setInterval(()=>{
+          this.nowmiao = this.audioCtx.currentTime;
+          console.log('当前src:'+this.audioCtx.src)
+          console.log('当前秒数:'+this.audioCtx.currentTime)
+          console.log('buffered:'+this.audioCtx.buffered)
+          console.log('duration:'+this.audioCtx.duration)
+          // this.nowmiao = timeCount;
+        },1000)
     },
     next() {
+      clearInterval(timeSet)
       let list = this.data.songList
       let id = this.song.id
       wx.showLoading({
@@ -205,9 +228,12 @@ export default {
         this.audioCtx.pause()
         // const afterlyric = this.normalizeLyric(this.song.lyric)
         // this.currentLyric = new Lyric(afterlyric)
+        // setTimeout(() => {
         this.audioCtx.src = this.song.url
-      this.audioCtx.singer = this.song.singer
-      this.audioCtx.title = this.song.name
+        this.audioCtx.singer = this.song.singer
+        this.audioCtx.title = this.song.name
+
+        // }, 500)
         wx.setNavigationBarTitle({
           title: decodeURIComponent(this.song.name)
         });
@@ -217,15 +243,31 @@ export default {
           this.audioCtx.play()
           wx.hideLoading()
         })
+        this.audioCtx.onWaiting(() => {
+          console.log('需要等待')
+        })
         const a = setInterval(() => {
+          console.log('是否在执行'+this.audioCtx.duration)
           this.allmiao = this.audioCtx.duration
         }, 50)
         if (this.allmiao) {
-          clearInterval('a')
-          setTimeout(() => {
-            wx.hideLoading()
-          }, 2500)
+          console.log('清除')
+          console.log(this.allmiao)
+          clearInterval(a)
         }
+        this.nowmiao = 0;
+        if (typeof (this.audioCtx.currentTime) === "undefined")
+        {
+          this.nowmiao = 0;
+        }
+        timeSet = setInterval(()=>{
+          this.nowmiao = this.audioCtx.currentTime;
+          console.log('当前src:'+this.audioCtx.src)
+          console.log('当前秒数:'+this.audioCtx.currentTime)
+          console.log('buffered:'+this.audioCtx.buffered)
+          console.log('duration:'+this.audioCtx.duration)
+          // this.nowmiao = timeCount;
+        },1000)
     },
     formact(current) {
       let interval = current | 0
@@ -270,10 +312,20 @@ export default {
       if (this.playing) {
         this.audioCtx.pause();
         this.setPlayingState(!this.playing)
+        clearInterval(timeSet)
       }
       else if (!this.playing) {
         this.audioCtx.play();
         this.setPlayingState(!this.playing);
+        this.nowmiao = this.audioCtx.currentTime;
+        timeSet = setInterval(()=>{
+          this.nowmiao = this.audioCtx.currentTime;
+          console.log('当前src:'+this.audioCtx.src)
+          console.log('当前秒数:'+this.audioCtx.currentTime)
+          console.log('buffered:'+this.audioCtx.buffered)
+          console.log('duration:'+this.audioCtx.duration)
+          // this.nowmiao = timeCount;
+        },1000)
       }
     },
     clClick(e) {
@@ -326,6 +378,11 @@ export default {
       //   }
       // }
     },
+    formatTime: function(x) {
+      return "number" != typeof x || x < 0 ? x : (x = parseInt(x), x %= 3600, [ parseInt(x / 60), x %= 60 ].map(function(x) {
+        return (x = x.toString())[1] ? x : "0" + x;
+      }).join(":"));
+    },
     // _getMusic(songmid){
     //   getMusic(songmid).then((res) => {
     //     if (res.code === ERR_OK) {
@@ -343,7 +400,6 @@ export default {
     wx.showLoading({
       title: '加载中'
     })
-    this.audioCtx = wx.getBackgroundAudioManager()
     this.midshow = true
     let options = this.$root.$mp.query;
     const songid = options.songid;
@@ -352,10 +408,18 @@ export default {
     console.log(options)
     console.log('this.song')
     console.log(this.song)
-    // if(this.audioCtx != null) { //第一次不用销毁
-    //     if(this.song.id != songid){
-    //         this.audioCtx.destroy()}
-    // }
+    if(this.audioCtx != null) { //第一次不用销毁
+      console.log('不用销毁')
+      console.log(this.audioCtx)
+        if(this.song.id != songid){
+          clearInterval(timeSet)
+        }
+    }else {
+      this.audioCtx = wx.getBackgroundAudioManager()
+      console.log('新建')
+      console.log(this.audioCtx)
+      // this.audioCtx = wx.createInnerAudioContext()
+    }
     if (this.song.id != songid || this.song.id == '') { // 同一首歌不用重新更新数据
       this.getSong(songid)
       console.log('进入getsong后')
@@ -366,26 +430,56 @@ export default {
         // 设置当前标题
         title: decodeURIComponent(this.song.name)
       });
-      this.audioCtx.src = this.song.url
-      this.audioCtx.singer = this.song.singer
-      this.audioCtx.title = this.song.name
+
+      // setTimeout(() => {
+        this.audioCtx.singer = this.song.singer
+        this.audioCtx.title = this.song.name
+        this.audioCtx.src = this.song.url
+        this.audioCtx.pause()
+      // }, 500)
       this.audioCtx.onCanplay(() => {
         console.log('ok了')
         this.setPlayingState(true)
-        this.audioCtx.play()
+        // this.allmiao = this.audioCtx.duration
+        // this.audioCtx.play()
         wx.hideLoading()
       })
-
+      this.audioCtx.onWaiting(() => {
+        console.log('需要等待')
+      })
       const a = setInterval(() => {
+        console.log('是否在执行'+this.audioCtx.duration)
         this.allmiao = this.audioCtx.duration
       }, 50)
       if (this.allmiao) {
-        clearInterval('a')
+        console.log('清除')
+        console.log(this.allmiao)
+        clearInterval(a)
       }
-      this.audioCtx.onTimeUpdate(() => {
-        this.nowmiao = this.audioCtx.currentTime
-      })
     }
+    this.nowmiao = this.audioCtx.currentTime;
+    console.log('mount:')
+    console.log(this.audioCtx.currentTime)
+    if (typeof (this.audioCtx.currentTime) === "undefined")
+    {
+      console.log('出现undefined')
+      this.nowmiao = 0;
+    }
+    timeSet = setInterval(()=>{
+      // this.nowmiao++;
+      this.nowmiao = this.audioCtx.currentTime;
+      console.log('当前src:'+this.audioCtx.src)
+      console.log('当前秒数:'+this.audioCtx.currentTime)
+      console.log('buffered:'+this.audioCtx.buffered)
+      console.log('duration:'+this.audioCtx.duration)
+      // this.nowmiao = timeCount;
+    },1000)
+
+    // this.audioCtx.onTimeUpdate(() => {
+    //   console.log('当前秒数')
+    //   console.log(this.audioCtx.currentTime)
+    //   this.nowmiao = this.audioCtx.currentTime;
+    // })
     wx.hideLoading()
     this.height = wx.getSystemInfoSync().windowHeight
 
