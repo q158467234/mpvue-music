@@ -1,35 +1,34 @@
 <template>
-          <scroll-view scroll-y="true" enable-back-to-top="true" class="mid-top">
-            <swiper-t :menu="menu"></swiper-t>
-            <mid-t :midimg="midimg"></mid-t>
-            <foot-t :footimg="footimg" :footname="footname1"></foot-t>
-            <foot-t :footimg="footimg2" :footname="footname2"></foot-t>
-            <foot-t :footimg="footimg3" :footname="footname3"></foot-t>
-          </scroll-view>
+    <scroll-view scroll-y="true" enable-back-to-top="true" class="mid-top">
+      <swiper :siderList="sider"></swiper>
+      <mid :midimg="midimg"></mid>
+      <show :showList="discList" :showTitle="discTitle"></show>
+      <show :showList="radioList" :showTitle="radioTitle"></show>
+    </scroll-view>
 </template>
 
 <script>
 import swiper from '@/components/swiper/swiper.vue'
 import mid from '@/components/mid/mid.vue'
-import foot from '@/components/foot/foot.vue'
+import show from '@/components/show/show.vue'
 export default {
     data(){
         return {
-            
+
         }
     },
     components:{
-        'swiper-t':swiper,
-        'mid-t':mid,
-        'foot-t':foot
+        'swiper':swiper,
+        'mid':mid,
+        'show':show
     },
-    props:['menu','midimg','footimg','footimg2','footimg3','footname1','footname2','footname3']
+    props:['sider','midimg','discList','discTitle','radioList','radioTitle']
 }
 </script>
 
 <style lang="stylus">
 .mid-top
-  padding-top 80rpx 
+  padding-top 80rpx
   width 100%
   height 2740rpx
   z-index 0

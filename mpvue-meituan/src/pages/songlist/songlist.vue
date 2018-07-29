@@ -1,21 +1,21 @@
 <template>
       <scroll-view scroll-y="true" enable-back-to-top="true" class="top">
-        <list-top :data="data" :midimg2="midimg2"></list-top>
+        <list-top :data="data" :songBar="songBar"></list-top>
         <div class="middle">
           <div class="middle-top">
             <img class="play" src="/static/images/index/play.png" style="width:45rpx;height:45rpx"/>
             <span class="txt1">播放全部</span>
-            <span class="txt2">(共{{data.songlist.length}}首)</span>
+            <span class="txt2">(共0首)</span>
             <div class="middle-top-right">
               <span><span class="add">+</span> 收藏</span>
             </div>
           </div>
-          <a :href="'/pages/my/main?id='+data.id+'&songid='+list.id+'&name='+data.name" v-for="list of data.songlist" :key="list.id" class="middle-mid">
-            <div class="middle-num">{{list.num}}</div>
+          <a :href="'/pages/player/main?id='+data.id+'&songid='+list.id+'&name='+list.name" v-for="list of songList" :key="list.id" class="middle-mid">
+            <div class="middle-num">{{list.duration}}</div>
             <div class="middle-right">
               <div class="middle-name">
                 <span class="middle-listname">{{list.name}}</span>
-                <span class="middle-singname">{{list.singername}}</span>
+                <span class="middle-singname">{{list.singer}}</span>
               </div>
               <img class="middle-more" src="/static/images/index/more.png">
             </div>
@@ -28,16 +28,43 @@
 import fly from '@/utils/flyio';
 import listtop from '@/components/listtop/listtop'
 import { mapState, mapMutations, mapGetters } from 'vuex';
+import { getSongList} from '@/api/recommend';
+import { createSong,initSong} from '@/api/song';
+import {ERR_OK} from '@/api/config'
+
 export default {
   data() {
     return {
+      songBar: [
+        {
+          "id": 1,
+          "url": "/static/images/index/ping.png",
+          "text": "评论"
+        },
+        {
+          "id": 2,
+          "url": "/static/images/index/share.png",
+          "text": "分享"
+        },
+        {
+          "id": 3,
+          "url": "/static/images/index/xiazai.png",
+          "text": "下载"
+        },
+        {
+          "id": 4,
+          "url": "/static/images/index/duoxuan.png",
+          "text": "多选"
+        }
+      ],
+      data:{},
+      songList:[],
     };
   },
   computed: {
      ...mapGetters([
-        'footimg',
+        'discList',
         'data',
-        'midimg2'
       ]),
   },
   components:{
@@ -46,38 +73,80 @@ export default {
   methods: {
     ...mapMutations({
       saveSonglist:'SAVE_SONGLIST'
-    })
+    }),
+    _getSongList(songId) {
+      // getSongList(songId)
+      getSongList(songId).then((res) => {
+        // console.log('getsong返回');
+        // console.log(res);
+        if (res.code === ERR_OK) {
+          console.log(res);
+          this.songList = this._normalizeSongs(res.cdlist[0].songlist)
+          let options = this.$root.$mp.query;
+          this.data = {
+            id:options.id,
+            picUrl:options.picUrl,
+            singer:options.singer,
+            songList:this.songList
+          }
+
+          this.saveSonglist(this.data)
+          console.log(this.data)
+        }
+      })
+    },
+    _normalizeSongs(list) {
+      let ret = []
+      list.forEach((musicData) => {
+        if (musicData.songid && musicData.albummid) {
+          // console.log(musicData)
+          // getMusic(musicData.songmid).then((res) => {
+          //   if (res.code === ERR_OK) {
+          //     const svkey = res.data.items
+          //     const songVkey = svkey[0].vkey
+          //     const newSong = createSong(musicData, songVkey)
+          //     ret.push(newSong)
+          //   }
+          // })
+          ret.push(initSong(musicData))
+        }
+      })
+      return ret
+    }
   },
   mounted() {
     let options = this.$root.$mp.query;
     wx.showLoading({
             title: '加载中'
         })
-    this.saveSonglist(options)
-    if (this.data.playCount != 'undefined') {
-          for (var i = 0; i < this.footimg.length; i++) {
-            if (this.data.id == this.footimg[i].id) {
-              this.saveSonglist(this.footimg[i]);
-              break
-            }
-          }
-        wx.hideLoading()
-    }else if(this.data.singer != 'undefined'){
-        fly
-        .get("music#!method=get")
-        .then(res => {
-          let re = res.data.data.footimg2;
-          for (var i = 0; i < re.length; i++) {
-            if (this.data.id == re[i].id) {
-              Object.assign(this.data, re[i]);
-              break
-            }
-          }
-        })
-        .catch(e => {
-          console.log(e);
-        });  
-    }
+    this._getSongList(options.id)
+    setTimeout(() => {
+      wx.hideLoading()
+    },2500)
+    // if (this.data.playCount != 'undefined') {
+    //       for (var i = 0; i < this.discList.length; i++) {
+    //         if (this.data.id == this.discList[i].id) {
+    //           this.saveSonglist(this.discList[i]);
+    //           break
+    //         }
+    //       }
+    //     wx.hideLoading()
+    // }else if(this.data.singer != 'undefined'){
+    //     fly
+    //     .get("https://www.easy-mock.com/mock/5b372361808a747e8d04a1e3/music#!method=get")
+    //     .then(res => {
+    //       let re = res.data.data.footimg2;
+    //       for (var i = 0; i < re.length; i++) {
+    //         if (this.data.id == re[i].id) {
+    //           Object.assign(this.data, re[i]);
+    //           break
+    //         }
+    //       }
+    //     })
+    //     .catch(e => {
+    //       console.log(e);
+    //     });
+    // }
   },
   onShow() {
     wx.setNavigationBarTitle({
@@ -90,7 +159,7 @@ export default {
 </script>
 
 <style lang="stylus">
-::-webkit-scrollbar 
+::-webkit-scrollbar
   width: 0
   height: 0
   color: transparent
@@ -109,7 +178,7 @@ export default {
     width 100%
     top 500rpx
     z-index 2
-    background-color #fff 
+    background-color #fff
     border-top-left-radius 25rpx
     border-top-right-radius 25rpx
     .middle-top
@@ -150,7 +219,7 @@ export default {
       align-items center
       font-size 30rpx
       font-weight 300
-      .middle-num  
+      .middle-num
         width 6%
         height 100rpx
         display flex
@@ -164,7 +233,7 @@ export default {
         height 100rpx
         border-bottom 1px solid #E2E3E4
         display flex
-        align-items center 
+        align-items center
         .middle-name
           margin-top 10rpx
           height 80rpx

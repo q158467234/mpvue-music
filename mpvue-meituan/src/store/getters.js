@@ -1,11 +1,11 @@
 export const playing = state => state.playing
 
-export const footimg = state => state.footimg
+export const discList = state => state.discList
 
 export const data = state => state.data
 
-export const midimg2 = state => state.midimg2
+export const radioList = state => state.radioList
 
-export const midimg3 = state => state.midimg3
+export const sliderList = state => state.sliderList
 
 export const song = state => state.song

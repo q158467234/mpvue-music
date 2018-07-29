@@ -1,19 +1,24 @@
-const state={
+const state = {
   playing: true,
-  footimg: [],
-  midimg2: [],
-  midimg3: [],
+  discList: [],
+  radioList: [],
+  sliderList: [],
   song: {
     id: '',
-    singername: '',
-    picUrl: '',
+    mid: '',
+    singer: '',
+    name: '',
+    album: '',
+    duration: '',
+    image: '',
+    url: '',
     lyric: ''
   },
   data: {
     id: 0,
-    picUrl: "",
-    playCount: "",
-    songlist:[]
+    picUrl: '',
+    singer: '',
+    songlist: []
   }
- }
- export default state
+}
+export default state

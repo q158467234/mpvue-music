@@ -10,7 +10,7 @@
             <div v-if="data.playCount !='undefined'"  class="number">
                 <image class="smallimg" src="/static/images/index/erji.png"/>
                 <div class="small-text">{{data.playCount}}万</div>
-            </div> 
+            </div>
         </div>
         <div class="rightbox">
             <div class="texttop">{{data.playCount!='undefined'?data.text:data.name}}</div>
@@ -19,9 +19,9 @@
                 <span class="bottxt">{{data.username}}</span>
             </div>
         </div>
-        <mid-t :midimg="midimg2" :sty="isstyle2"></mid-t>
+        <mid :midimg="songBar" :sty="isstyle2"></mid>
         </div>
-        
+
     </div>
 </template>
 
@@ -31,16 +31,16 @@ export default {
     data(){
         return {
             c:{background:'url('+this.data.picUrl+')'},
-            isstyle2:true
+            isstyle2:true,
         }
     },
     computed:{
 
     },
     components:{
-        'mid-t':mid
+        'mid':mid
     },
-props:['data','midimg2']
+props:['data','songBar']
 }
 </script>
 
@@ -60,7 +60,7 @@ props:['data','midimg2']
    position absolute
    width 100%
    height 100%
-   background black 
+   background black
    opacity .6
   .filimg
    margin 0
@@ -68,10 +68,10 @@ props:['data','midimg2']
    border 0
  .bigbox-content
   position relative
-  display flex  
+  display flex
   .leftbox
    margin-top 90rpx
-   margin-left 50rpx 
+   margin-left 50rpx
    width 260rpx
    height 260rpx
    border-radius 10rpx
@@ -80,12 +80,12 @@ props:['data','midimg2']
     width 260rpx
     height 260rpx
     border-radius 10rpx
-   .number 
+   .number
      width 120rpx
      height 30rpx
      font-size 25rpx
      text-align right
-     color #ffffff 
+     color #ffffff
      top 5rpx
      bottom 0
      right 10rpx
@@ -95,16 +95,16 @@ props:['data','midimg2']
      .smallimg
       width 30rpx
       height 30rpx
-     .smallimg-text 
+     .smallimg-text
       width 90rpx
-      height 30rpx 
+      height 30rpx
       line-height 30rpx
-      align-items center 
+      align-items center
   .rightbox
    margin-top 90rpx
    margin-left 50rpx
    width 350rpx
-   height 260rpx 
+   height 260rpx
    .texttop
     font-size 35rpx
     font-weight 600
@@ -122,8 +122,8 @@ props:['data','midimg2']
     align-items center
     .bottxt
      margin-left 20rpx
-     text-align left 
+     text-align left
   .mid
-   height 200rpx    
-   
+   height 200rpx
+
 </style>

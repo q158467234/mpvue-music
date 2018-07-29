@@ -4,10 +4,10 @@
         <div class="cirmiddle">
             <img :src="img" class="circle" :class="circle">
         </div>
-        <mid-t :midimg="midimg3" :sty="isstyle2"></mid-t>
-    </div>            
+        <mid :midimg="songBar" :sty="isstyle2"></mid>
+    </div>
 </div>
-    
+
 </template>
 
 <script>
@@ -16,7 +16,29 @@ export default {
     data(){
         return {
             isstyle2: true,
-            midshow: false
+            midshow: false,
+            songBar: [
+              {
+                "id": 1,
+                "url": "/static/images/index/like.png",
+                "text": ""
+              },
+              {
+                "id": 2,
+                "url": "/static/images/index/xiazai.png",
+                "text": ""
+              },
+              {
+                "id": 3,
+                "url": "/static/images/index/ping.png",
+                "text": ""
+              },
+              {
+                "id": 4,
+                "url": "/static/images/index/sl.png",
+                "text": ""
+              }
+            ],
         }
     },
     computed:{
@@ -31,7 +53,7 @@ export default {
     },
     props:['img','midimg3','playing','midshow'],
     components:{
-        'mid-t':mid
+        'mid':mid
     },
 }
 </script>
@@ -40,7 +62,7 @@ export default {
 .middle
     width 100%
     height 70%
-    position absolute 
+    position absolute
     display flex
     .cirmid
         margin-top 120rpx
@@ -59,11 +81,11 @@ export default {
                 height 500rpx
                 border-radius 50%
                 border 15px solid rgba(255,255,255,.1)
-                &.play 
+                &.play
                     animation: rotate 20s linear infinite
-                &.pause 
+                &.pause
                     animation-play-state: paused
-  
+
 .mid.sty
     margin-top 400rpx
 </style>
@@ -75,5 +97,5 @@ export default {
        transform: rotate(360deg);
   }
     }
- </style> 
+ </style>
 

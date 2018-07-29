@@ -1,21 +1,21 @@
 <template>
     <div class="foot-top">
         <div class="top">
-            <span>{{footname}}</span> ＞
+            <span>{{showTitle}}</span> ＞
         </div>
         <div url="/pages/order/main" class="middle">
-            <a :href="'/pages/songlist/main?id='+item.id+'&playCount='+item.playCount+'&singer='+item.singer+'&vip='+item.vip" class="mid-six" v-for="item of footimg" :key="item.id">
+            <a :href="'/pages/songlist/main?id='+item.id+'&singer='+item.songListAuthor+'&picUrl='+item.picUrl" class="mid-six" v-for="item of showList" :key="item.id">
                 <div class="six">
                    <image class="six-img" :src="item.picUrl" alt="#"/>
-                   <div v-if="item.vip" class="vip">付费精品</div>
-                   <div v-if="item.playCount" class="number">
-                    <image class="smallimg" src="/static/images/index/erji.png"/>
-                    <div class="small-text">{{item.playCount}}万</div>
-                   </div> 
+                   <!--<div v-if="item.vip" class="vip">付费精品</div>-->
+                   <div class="number">
+                     <image class="smallimg" src="/static/images/index/erji.png"/>
+                     <div class="small-text">{{item.accessnum}}万</div>
+                   </div>
                 </div>
-                <span class="six-text" v-if="item.text">{{item.text}}</span>
-                <span class="six-name" v-if="item.name">{{item.name}}</span>
-                <span class="six-text small" v-if="item.singer">{{item.singer}}</span>
+                <span class="six-text" v-if="item.songListDesc">{{item.songListDesc}}</span>
+                <!--<span class="six-name" v-if="item.name">{{item.name}}</span>-->
+                <span class="six-text small" v-if="item.songListAuthor">{{item.songListAuthor}}</span>
             </a>
         </div>
     </div>
@@ -23,7 +23,7 @@
 
 <script>
 export default {
-    props:['footimg','footname']
+    props:['showList','showTitle']
 }
 </script>
 
@@ -36,7 +36,7 @@ export default {
  top 550rpx
  .top
   padding-left 16rpx
-  padding-top 20rpx  
+  padding-top 20rpx
   height 60rpx
   line-height 60rpx
   font-size 33rpx
@@ -68,12 +68,12 @@ export default {
      width 230rpx
      height 230rpx
      border-radius 10rpx
-    .number 
+    .number
      width 120rpx
      height 30rpx
      font-size 25rpx
      text-align right
-     color #ffffff 
+     color #ffffff
      top 5rpx
      bottom 0
      right 10rpx
@@ -83,9 +83,9 @@ export default {
      .smallimg
       width 30rpx
       height 30rpx
-     .smallimg-text 
+     .smallimg-text
       width 90rpx
-      height 30rpx 
+      height 30rpx
       line-height 30rpx
       align-items center
     .vip
@@ -103,7 +103,7 @@ export default {
      background-color #E3453A
      text-align center
      line-height 30rpx
-     color #ffffff 
+     color #ffffff
    .six-text
     margin-top 10rpx
     font-size 25rpx
